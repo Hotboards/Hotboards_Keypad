@@ -29,7 +29,7 @@
 || #
 ||
 */
-#include <Keypad.h>
+#include <Hotboards_Keypad.h>
 
 // <<constructor>> Allows custom keymap, pin configuration, and keypad sizes.
 Keypad::Keypad(char *userKeymap, byte *row, byte *col, byte numRows, byte numCols) {
@@ -59,7 +59,7 @@ char Keypad::getKey() {
 
 	if (getKeys() && key[0].stateChanged && (key[0].kstate==PRESSED))
 		return key[0].kchar;
-	
+
 	single_key = false;
 
 	return NO_KEY;
@@ -82,20 +82,20 @@ bool Keypad::getKeys() {
 // Private : Hardware scan
 void Keypad::scanKeys() {
 	// Re-intialize the row pins. Allows sharing these pins with other hardware.
-	for (byte r=0; r<sizeKpd.rows; r++) {
-		pin_mode(rowPins[r],INPUT_PULLUP);
+	for (byte r=0; r<sizeKpd.columns; r++) {
+		pin_mode(columnPins[r],INPUT_PULLUP);
 	}
 
 	// bitMap stores ALL the keys that are being pressed.
-	for (byte c=0; c<sizeKpd.columns; c++) {
-		pin_mode(columnPins[c],OUTPUT);
-		pin_write(columnPins[c], LOW);	// Begin column pulse output.
-		for (byte r=0; r<sizeKpd.rows; r++) {
-			bitWrite(bitMap[r], c, !pin_read(rowPins[r]));  // keypress is active low so invert to high.
+	for (byte r=0; r<sizeKpd.rows; r++) {
+		pin_mode(rowPins[r],OUTPUT);
+		pin_write(rowPins[r], LOW);	// Begin column pulse output.
+		for (byte c=0; c<sizeKpd.columns; c++) {
+			bitWrite(bitMap[c], r, !pin_read(columnPins[c]));  // keypress is active low so invert to high.
 		}
 		// Set pin to high impedance input. Effectively ends column pulse.
-		pin_write(columnPins[c],HIGH);
-		pin_mode(columnPins[c],INPUT);
+		pin_write(rowPins[r],HIGH);
+		pin_mode(rowPins[r],INPUT);
 	}
 }
 
@@ -114,10 +114,10 @@ bool Keypad::updateList() {
 	}
 
 	// Add new keys to empty slots in the key list.
-	for (byte r=0; r<sizeKpd.rows; r++) {
-		for (byte c=0; c<sizeKpd.columns; c++) {
+	for (byte c=0; c<sizeKpd.columns; c++) {
+		for (byte r=0; r<sizeKpd.rows; r++) {
 			boolean button = bitRead(bitMap[r],c);
-			char keyChar = keymap[r * sizeKpd.columns + c];
+			char keyChar = keymap[c * sizeKpd.rows + r];
 			int keyCode = r * sizeKpd.columns + c;
 			int idx = findInList (keyCode);
 			// Key is already on the list so set its next state.
