@@ -1,7 +1,12 @@
 /*
 ||
-|| @file Keypad.cpp
-|| @version 3.1
+|| @file Hotboards_Keypad.h
+|| @version 3.2
+|| @ported by Diego (Hotboards)
+|| This Keypad fork library allow to work with keyboard that
+|| has physical pull-ups on columns (rather than rows)
+||
+|| Keypad library originaly develop by:
 || @author Mark Stanley, Alexander Brevig
 || @contact mstanley@technologist.com, alexanderbrevig@gmail.com
 ||
@@ -83,19 +88,19 @@ bool Keypad::getKeys() {
 void Keypad::scanKeys() {
 	// Re-intialize the row pins. Allows sharing these pins with other hardware.
 	for (byte r=0; r<sizeKpd.columns; r++) {
-		pin_mode(columnPins[r],INPUT_PULLUP);
+		pinMode(columnPins[r],INPUT);
 	}
 
 	// bitMap stores ALL the keys that are being pressed.
 	for (byte r=0; r<sizeKpd.rows; r++) {
-		pin_mode(rowPins[r],OUTPUT);
-		pin_write(rowPins[r], LOW);	// Begin column pulse output.
+		pinMode(rowPins[r],OUTPUT);
+		digitalWrite(rowPins[r], LOW);	// Begin column pulse output.
 		for (byte c=0; c<sizeKpd.columns; c++) {
-			bitWrite(bitMap[c], r, !pin_read(columnPins[c]));  // keypress is active low so invert to high.
+			bitWrite(bitMap[c], r, !digitalRead(columnPins[c]));  // keypress is active low so invert to high.
 		}
 		// Set pin to high impedance input. Effectively ends column pulse.
-		pin_write(rowPins[r],HIGH);
-		pin_mode(rowPins[r],INPUT);
+		digitalWrite(rowPins[r],HIGH);
+		pinMode(rowPins[r],INPUT);
 	}
 }
 
