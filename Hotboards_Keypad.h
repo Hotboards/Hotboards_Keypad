@@ -80,7 +80,7 @@ typedef struct {
  *
  * Keypad kpd( makeKeymap( keys ), rowPins, colPins, 4, 4 );
  *
- * int main( void )
+ * void loop( void )
  * {
  *    while(1){
  *       char key = keypad.getKey( );
