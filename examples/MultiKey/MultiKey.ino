@@ -10,6 +10,15 @@
 || | active keys all being pressed at the same time. This sketch is an
 || | example of how you can get multiple key presses from a keypad or
 || | keyboard.
+|| | arduino    keypad
+|| | 6 ---------> C4
+|| | 7 ---------> C3
+|| | 8 ---------> C2
+|| | 9 ---------> C1
+|| | 2 ---------> R4
+|| | 3 ---------> R3
+|| | 4 ---------> R2
+|| | 5 ---------> R1
 || #
 */
 

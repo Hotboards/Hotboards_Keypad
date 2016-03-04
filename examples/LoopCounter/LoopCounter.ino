@@ -7,6 +7,15 @@
 || @description
 || | Demonstrates the effect of debounce time, just change the
 || | debounce time using the fucntion setDebounceTime
+|| | arduino    keypad
+|| | 6 ---------> C4
+|| | 7 ---------> C3
+|| | 8 ---------> C2
+|| | 9 ---------> C1
+|| | 2 ---------> R4
+|| | 3 ---------> R3
+|| | 4 ---------> R2
+|| | 5 ---------> R1
 || #
 */
 #include <Hotboards_Keypad.h>

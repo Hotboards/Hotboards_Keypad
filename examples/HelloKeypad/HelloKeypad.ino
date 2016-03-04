@@ -7,6 +7,15 @@
 || @description
 || | Demonstrates the simplest use of the matrix Keypad library.
 || | Just press any key an it will be displayed on the serial port
+|| | arduino    keypad
+|| | 6 ---------> C4
+|| | 7 ---------> C3
+|| | 8 ---------> C2
+|| | 9 ---------> C1
+|| | 2 ---------> R4
+|| | 3 ---------> R3
+|| | 4 ---------> R2
+|| | 5 ---------> R1
 || #
 */
 #include <Hotboards_Keypad.h>

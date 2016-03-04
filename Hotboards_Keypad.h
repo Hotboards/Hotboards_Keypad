@@ -60,45 +60,243 @@ typedef struct {
 #define makeKeymap(x) ((char*)x)
 
 
-//class Keypad : public Key, public HAL_obj {
+/** Hotboards_keypad class.
+ *  Used to control general purpose leds
+ *
+ * Example:
+ * @code
+ * #include <Arduino.h>
+ * #include "Hotboards_keypad.h"
+ *
+ * char keys[ 4 ][ 4 ] =
+ * {
+ *    {'1','2','3','A'},
+ *    {'4','5','6','B'},
+ *    {'7','8','9','C'},
+ *    {'*','0','#','D'}
+ * };
+ * byte rowPins[ 4 ] = { 5, 4, 3, 2 }; //connect to the row pinouts of the keypad
+ * byte colPins[ 4 ] = { 9, 8, 7, 6 }; //connect to the column pinouts of the keypad
+ *
+ * Keypad kpd( makeKeymap( keys ), rowPins, colPins, 4, 4 );
+ *
+ * int main( void )
+ * {
+ *    while(1){
+ *       char key = keypad.getKey( );
+ *       if( key ){
+ *           // do something with key
+ *       }
+ *    }
+ * }
+ * @endcode
+ */
 class Keypad : public Key {
-public:
+  public:
 
-	Keypad(char *userKeymap, byte *row, byte *col, byte numRows, byte numCols);
+    /** Allows custom keymap, pin configuration, and keypad sizes
+      * @param userKeymap pointer to bidimentional array with key definitions
+      * @param row pointer to array with pins conected to rows
+      * @param col pointer to array with pins conected to columns
+      * @param numRows number of rows in use
+      * @param numCols number of columns in use
+      *
+      * Example:
+      * @code
+      *   char keys[ 4 ][ 4 ] =
+      *   {
+      *     {'1','2','3','A'},
+      *     {'4','5','6','B'},
+      *     {'7','8','9','C'},
+      *     {'*','0','#','D'}
+      *   };
+      *   byte rowPins[ 4 ] = { 5, 4, 3, 2 };
+      *   byte colPins[ 4 ] = { 9, 8, 7, 6 };
+      *   Keypad kpd( makeKeymap( keys ), rowPins, colPins, 4, 4 );
+      * @endcode
+      */
+    Keypad(char *userKeymap, DigitalInOut *row, DigitalInOut *col, uint8_t numRows, uint8_t numCols);
 
-	uint bitMap[MAPSIZE];	// 10 row x 16 column array of bits. Except Due which has 32 columns.
-	Key key[LIST_MAX];
-	unsigned long holdTimer;
+    /** Returns a single key only. Retained for backwards compatibility.
+      * @return key pressed (user defined key)
+      *
+      * Example:
+      * @code
+      *   char key = keypad.getKey( );
+      *   if( key ){
+      *     // do something with key
+      *   }
+      * @endcode
+      */
+    char getKey(void);
 
-	char getKey();
-	bool getKeys();
-	KeyState getState();
-	void begin(char *userKeymap);
-	bool isPressed(char keyChar);
-	void setDebounceTime(uint);
-	void setHoldTime(uint);
-	void addEventListener(void (*listener)(char));
-	int findInList(char keyChar);
-	int findInList(int keyCode);
-	char waitForKey();
-	bool keyStateChanged();
-	byte numKeys();
+    /** Populate the key list (check public key array).
+      * @return true if user pressed any key(s)
+      *
+      * Example:
+      * @code
+      * if( kpd.getKeys( ) ){
+      *   // you need to poll the array kpd.key[]
+      *   for( int i=0 ; i<LIST_MAX ; i++ ){
+      *     if( kpd.key[ i ].stateChanged ){
+      *       chat = kpd.key[ i ].kchar;
+      *     }
+      * }
+      * @endcode
+      */
+    bool getKeys(void);
+
+    /** Get the state of the first key on the list of active keys
+      * @return key[0].kstate
+      *
+      * Example:
+      * @code
+      *   if(kpd.getState() == PRESSED ){
+      *     // do something
+      *   }
+      * @endcode
+      */
+    KeyState getState(void);
+
+    /** Let the user define a keymap - assume the same row/column
+      * count as defined in constructor
+      * @param userKeymap pointer to user keymap
+      *
+      * Example:
+      * @code
+      *   // lets assume user wnats to change the keymap
+      *   kpd.begin( makeKeymap( NewKeys )),
+      * @endcode
+      */
+    void begin(char *userKeymap);
+
+    /** Return a true if the selected key is pressed. Is neccesary
+      * to call getKeys function first
+      * @return key pressed (user defined key)
+      *
+      * Example:
+      * @code
+      *  if( kpd.getKeys( ) ){
+      *    if( kpd.isPressed( '2' ) ){
+      *      // key '2' have been press
+      *    }
+      *  }
+      * @endcode
+      */
+    bool isPressed(char keyChar);
+
+    /** Set a new debounce time (1ms is the minimum value)
+      * @param debounce time in milliseconds
+      *
+      * Example:
+      * @code
+      *  // change default 10ms debounce time to 20ms
+      *  kpd.setDebounceTime( 20 );
+      * @endcode
+      */
+    void setDebounceTime(uint);
+
+    /** Set a new time to considered a key is in hold state
+      * @param hold hold time in milliseconds
+      *
+      * Example:
+      * @code
+      *  // change default 500ms hold time to 250ms
+      *  kpd.setHoldTime( 250 );
+      * @endcode
+      */
+    void setHoldTime(uint);
+
+    /** Set a callback function to be called everytime an key change its status
+      * @param listener function to be called
+      *
+      * Example:
+      * @code
+      *   kpd.addEventListener( keypadEvent );
+      * @endcode
+      */
+    void addEventListener(void (*listener)(char));
+
+    /** Search by character for a key in the list of active keys.
+      * @return Returns -1 if not found or the index into the list of active keys.
+      *
+      * Example:
+      * @code
+      *   // kpd.getKeys function needs to be called first
+      *   int index = findInList( '7' );
+      *   if( kpd.key[ index ].stateChanged ){
+      *     // the key change, so do something =)
+      *   }
+      * @endcode
+      */
+    int findInList(char keyChar);
+
+    /** Search by code for a key in the list of active keys.
+      * @return Returns -1 if not found or the index into the list of active keys.
+      *
+      * Example:
+      * @code
+      *   // kpd.getKeys function needs to be called first
+      *   int index = findInList( 10 );
+      *   if( kpd.key[ index ].stateChanged ){
+      *     // the key change, so do something =)
+      *   }
+      * @endcode
+      */
+    int findInList(int keyCode);
+
+    /** lock everything while waiting for a keypress.
+      * @return key pressed
+      *
+      * Example:
+      * @code
+      *   char key = kpd.waitForKey();
+      * @endcode
+      */
+    char waitForKey(void);
+
+    /** Return stateChanged element of the first key from the active list
+      * @return key[0].stateChanged
+      *
+      * Example:
+      * @code
+      *   if( kpd.keyStateChanged() ){
+      *     // do something
+      *   }
+      * @endcode
+      */
+    bool keyStateChanged(void);
+
+    /** The number of keys on the key list, key[LIST_MAX]
+      * @return number of keys
+      *
+      * Example:
+      * @code
+      *   int keyNum = numKeys();
+      * @endcode
+      */
+    uint8_t numKeys(void);
+
+    uint bitMap[MAPSIZE];   // 10 row x 16 column array of bits. Except Due which has 32 columns.
+    Key key[LIST_MAX];
+    unsigned long holdTimer;
 
 private:
-	unsigned long startTime;
-	char *keymap;
-    byte *rowPins;
-    byte *columnPins;
-	KeypadSize sizeKpd;
-	uint debounceTime;
-	uint holdTime;
-	bool single_key;
+    unsigned long startTime;
+    char *keymap;
+    DigitalInOut *rowPins;
+    DigitalInOut *columnPins;
+    KeypadSize sizeKpd;
+    uint debounceTime;
+    uint holdTime;
+    bool single_key;
+    Timer debounce;
 
-	void scanKeys();
-	bool updateList();
-	void nextKeyState(byte n, boolean button);
-	void transitionTo(byte n, KeyState nextState);
-	void (*keypadEventListener)(char);
+    void scanKeys();
+    bool updateList();
+    void nextKeyState(uint8_t n, bool button);
+    void transitionTo(uint8_t n, KeyState nextState);
+    void (*keypadEventListener)(char);
 };
 
 #endif

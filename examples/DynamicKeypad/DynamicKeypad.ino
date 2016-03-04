@@ -77,7 +77,15 @@
 || |    To better understand how the event handler affects your code you will need to remember
 || |    that it gets called only when you press, hold or release a key.  However, once a key
 || |    is pressed or held then the event handler gets called at the full speed of the loop().
-|| |
+|| | arduino    keypad
+|| | 6 ---------> C4
+|| | 7 ---------> C3
+|| | 8 ---------> C2
+|| | 9 ---------> C1
+|| | 2 ---------> R4
+|| | 3 ---------> R3
+|| | 4 ---------> R2
+|| | 5 ---------> R1
 || #
 */
 #include <Hotboards_Keypad.h>
