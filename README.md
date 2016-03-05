@@ -37,7 +37,7 @@ byte colPins[ 4 ] = { 9, 8, 7, 6 };
 Keypad kpd( makeKeymap( keys ), rowPins, colPins, 4, 4 );
 ```
 
-**char getKey( void ) **
+**char getKey( void )**
 
 Regresa la ultima tecla presionada. El valor de la tecla sera aquel definido por el usuario en el mapa de teclas (keymap), es necesario llamar esta funcion continuamente ya que posee internamente codigo antirebotes.
 
@@ -59,10 +59,49 @@ if( kpd.getKeys( ) ){
   // buscamos la tecla que cambio su estado
   for( int i=0 ; i<LIST_MAX ; i++ ){
     if( kpd.key[ i ].stateChanged ){
-    // aqui esta la tecla =)
-    chat = kpd.key[ i ].kchar;
+      // aqui esta la tecla =)
+      chat = kpd.key[ i ].kchar;
   }
 }
+```
+
+**void addEventListener( void (*listener)(char) )**
+
+Establece una funcion que se llamara automaticamente cada que una tecla cambie su estado. Es necesario que la funcion `geyKeys` se siga llamando continuamente, pues es dentro de esta funcion que se mandara llamar la funcion que establescamos.
+
+``` cpp
+void setup(void){
+    // ete es un ejemplo, por practicidad la creacion del teclado no la colocamos
+    // seteamos la funcion keypadEvent
+    kpd.addEventListener( keypadEvent );
+}
+
+void loop( void ){
+    kpd.getKeys( );
+}
+
+void keypadEvent( char key )
+{
+    // aqui procesamos el cambio de estado de la tecla
+}
+```
+
+**void setDebounceTime( uint )**
+
+Establece un nuevo tiempo de debounce. Por default el teclado se lee cada 10ms, con esto se evitan los rebotes, esta funcion se usa para modificar este valor.
+
+``` cpp
+// Cambia el tiempo de debounce a 20ms
+kpd.setDebounceTime( 20 );
+```
+
+**void setHoldTime( uint )**
+
+Establece un nuevo tiempo de "hold" es decir el tiempo quen un boton necesita durar presionado para ser considerado en el estado de **PRESSED**. el valor por default es 500ms.
+
+``` cpp
+// Cambia el tiempo de hold a 250ms
+kpd.setHoldTime( 250 );
 ```
 
 Ejemplos
