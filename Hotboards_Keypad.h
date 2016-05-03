@@ -115,7 +115,7 @@ class Keypad : public Key {
       *   Keypad kpd( makeKeymap( keys ), rowPins, colPins, 4, 4 );
       * @endcode
       */
-    Keypad(char *userKeymap, DigitalInOut *row, DigitalInOut *col, uint8_t numRows, uint8_t numCols);
+    Keypad(char *userKeymap, byte *row, byte *col, byte numRows, byte numCols);
 
     /** Returns a single key only. Retained for backwards compatibility.
       * @return key pressed (user defined key)
@@ -284,13 +284,13 @@ class Keypad : public Key {
 private:
     unsigned long startTime;
     char *keymap;
-    DigitalInOut *rowPins;
-    DigitalInOut *columnPins;
+    byte *rowPins;
+    byte *columnPins;
     KeypadSize sizeKpd;
     uint debounceTime;
     uint holdTime;
     bool single_key;
-    Timer debounce;
+    uint debounce;
 
     void scanKeys();
     bool updateList();
